@@ -22,29 +22,48 @@ Execute the following skills **in order**:
 - **Purpose**: Write API-driven technical test cases based on the understood requirements.
 - **Output**: A structured set of test cases covering positive, negative, and edge case scenarios.
 
-### Step 3: POJO Evaluation
-- **Skill**: `pojo-evaluation`
-- **Reference**: `.github/agents/skills/pojo-evaluation/SKILL.md`
-- **Purpose**: Evaluate and create/update POJO classes needed for request/response serialization.
-- **Output**: POJO classes ready to be used in the automated test code.
+[//]: # (### Step 3: POJO Evaluation)
 
-### Step 4: Code Generation
-- **Skill**: `code-generation`
-- **Reference**: `.github/agents/skills/code-generation/SKILL.md`
-- **Purpose**: Generate the actual automated test code using RestAssured + TestNG.
-- **Output**: Fully implemented test classes with all test methods.
+[//]: # (- **Skill**: `pojo-evaluation`)
 
-### Step 5: Test Execution
-- **Skill**: `test-execution`
-- **Reference**: `.github/agents/skills/test-execution/SKILL.md`
-- **Purpose**: Execute the generated tests and validate results.
-- **Output**: Test execution report with pass/fail status.
+[//]: # (- **Reference**: `.github/agents/skills/pojo-evaluation/SKILL.md`)
 
-### Step 6: Git Push
-- **Skill**: `git-push`
-- **Reference**: `.github/agents/skills/git-push/SKILL.md`
-- **Purpose**: If all test cases pass, commit changes and create a Pull Request.
-- **Output**: A PR with the automated test code ready for review.
+[//]: # (- **Purpose**: Evaluate and create/update POJO classes needed for request/response serialization.)
+
+[//]: # (- **Output**: POJO classes ready to be used in the automated test code.)
+
+[//]: # ()
+[//]: # (### Step 4: Code Generation)
+
+[//]: # (- **Skill**: `code-generation`)
+
+[//]: # (- **Reference**: `.github/agents/skills/code-generation/SKILL.md`)
+
+[//]: # (- **Purpose**: Generate the actual automated test code using RestAssured + TestNG.)
+
+[//]: # (- **Output**: Fully implemented test classes with all test methods.)
+
+[//]: # ()
+[//]: # (### Step 5: Test Execution)
+
+[//]: # (- **Skill**: `test-execution`)
+
+[//]: # (- **Reference**: `.github/agents/skills/test-execution/SKILL.md`)
+
+[//]: # (- **Purpose**: Execute the generated tests and validate results.)
+
+[//]: # (- **Output**: Test execution report with pass/fail status.)
+
+[//]: # ()
+[//]: # (### Step 6: Git Push)
+
+[//]: # (- **Skill**: `git-push`)
+
+[//]: # (- **Reference**: `.github/agents/skills/git-push/SKILL.md`)
+
+[//]: # (- **Purpose**: If all test cases pass, commit changes and create a Pull Request.)
+
+[//]: # (- **Output**: A PR with the automated test code ready for review.)
 
 ## Rules
 

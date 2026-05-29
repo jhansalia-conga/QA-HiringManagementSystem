@@ -1,0 +1,214 @@
+[
+  {
+    "slNo": "1",
+    "testCaseId": "TC_HMS_001",
+    "testCaseName": "Apply for a Job Based on Company",
+    "testCaseDescription": "Verify that a candidate can search jobs by company name, extract the jobId, apply for the job, and confirm the application appears in the dashboard with status PENDING",
+    "steps": [
+      {
+        "step": "Login with candidate credentials: POST http://localhost:5000/api/auth/login",
+        "requestBody": "{\n  \"email\": \"johndoe@test.com\",\n  \"password\": \"Pass@123\"\n}",
+        "responseBody": "{\n  \"success\": true,\n  \"data\": {\n    \"accessToken\": \"eyJhbGciOiJIUzI1NiJ9...\",\n    \"id\": 2,\n    \"email\": \"johndoe@test.com\",\n    \"fullName\": \"John Doe\",\n    \"role\": \"CANDIDATE\"\n  }\n}"
+      },
+      {
+        "step": "Search jobs by company name: GET http://localhost:5000/api/jobs?company=CloudNine%20Technologies",
+        "requestBody": "http://localhost:5000/api/jobs?company=CloudNine%20Technologies",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Jobs retrieved\",\n  \"data\": [\n    {\n      \"id\": 3,\n      \"title\": \"Full Stack Developer\",\n      \"description\": \"Full Stack Developer role at CloudNine Technologies\",\n      \"location\": \"Bangalore, India\",\n      \"company\": \"CloudNine Technologies\",\n      \"salary\": \"12,00,000 - 20,00,000\",\n      \"type\": \"FULL_TIME\",\n      \"active\": true\n    }\n  ]\n}"
+      },
+      {
+        "step": "Extract jobId from the search response",
+        "requestBody": "",
+        "responseBody": "jobId = 3 (extracted from data[0].id where company = CloudNine Technologies)"
+      },
+      {
+        "step": "Apply for the job: POST http://localhost:5000/api/applications",
+        "requestBody": "{\n  \"jobId\": 3,\n  \"coverLetter\": \"I am applying for the Full Stack Developer role at CloudNine Technologies.\"\n}",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Application submitted\",\n  \"data\": {\n    \"id\": 9,\n    \"job\": {\n      \"id\": 3,\n      \"title\": \"Full Stack Developer\",\n      \"location\": \"Bangalore, India\",\n      \"company\": \"CloudNine Technologies\",\n      \"salary\": \"12,00,000 - 20,00,000\",\n      \"type\": \"FULL_TIME\",\n      \"active\": true\n    },\n    \"candidate\": {\n      \"id\": 2,\n      \"email\": \"johndoe@test.com\",\n      \"fullName\": \"John Doe\",\n      \"role\": \"CANDIDATE\"\n    },\n    \"status\": \"PENDING\",\n    \"coverLetter\": \"I am applying for the Full Stack Developer role at CloudNine Technologies.\",\n    \"appliedAt\": \"2026-05-28T22:00:00.000\"\n  }\n}"
+      },
+      {
+        "step": "Verify application appears in the dashboard: GET http://localhost:5000/api/applications/my",
+        "requestBody": "",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Applications retrieved\",\n  \"data\": [\n    {\n      \"id\": 9,\n      \"job\": {\n        \"id\": 3,\n        \"title\": \"Full Stack Developer\",\n        \"location\": \"Bangalore, India\",\n        \"company\": \"CloudNine Technologies\"\n      },\n      \"candidate\": {\n        \"id\": 2,\n        \"email\": \"johndoe@test.com\",\n        \"fullName\": \"John Doe\",\n        \"role\": \"CANDIDATE\"\n      },\n      \"status\": \"PENDING\",\n      \"appliedAt\": \"2026-05-28T22:00:00.000\"\n    }\n  ]\n}"
+      }
+    ]
+  },
+  {
+    "slNo": "2",
+    "testCaseId": "TC_HMS_002",
+    "testCaseName": "Apply for a Job Based on Job Title",
+    "testCaseDescription": "Verify that a candidate can search jobs by job title, extract the jobId, apply for the job, and confirm the application appears in the dashboard with status PENDING",
+    "steps": [
+      {
+        "step": "Login with candidate credentials: POST http://localhost:5000/api/auth/login",
+        "requestBody": "{\n  \"email\": \"johndoe@test.com\",\n  \"password\": \"Pass@123\"\n}",
+        "responseBody": "{\n  \"success\": true,\n  \"data\": {\n    \"accessToken\": \"eyJhbGciOiJIUzI1NiJ9...\",\n    \"id\": 2,\n    \"email\": \"johndoe@test.com\",\n    \"fullName\": \"John Doe\",\n    \"role\": \"CANDIDATE\"\n  }\n}"
+      },
+      {
+        "step": "Search jobs by job title: GET http://localhost:5000/api/jobs?title=Full%20Stack%20Developer",
+        "requestBody": "http://localhost:5000/api/jobs?title=Full%20Stack%20Developer",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Jobs retrieved\",\n  \"data\": [\n    {\n      \"id\": 3,\n      \"title\": \"Full Stack Developer\",\n      \"description\": \"Full Stack Developer role at CloudNine Technologies\",\n      \"location\": \"Bangalore, India\",\n      \"company\": \"CloudNine Technologies\",\n      \"salary\": \"12,00,000 - 20,00,000\",\n      \"type\": \"FULL_TIME\",\n      \"active\": true\n    }\n  ]\n}"
+      },
+      {
+        "step": "Extract jobId from the search response",
+        "requestBody": "",
+        "responseBody": "jobId = 3 (extracted from data[0].id where title = Full Stack Developer)"
+      },
+      {
+        "step": "Apply for the job: POST http://localhost:5000/api/applications",
+        "requestBody": "{\n  \"jobId\": 3,\n  \"coverLetter\": \"I am applying for the Full Stack Developer position as it aligns with my experience.\"\n}",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Application submitted\",\n  \"data\": {\n    \"id\": 10,\n    \"job\": {\n      \"id\": 3,\n      \"title\": \"Full Stack Developer\",\n      \"location\": \"Bangalore, India\",\n      \"company\": \"CloudNine Technologies\",\n      \"salary\": \"12,00,000 - 20,00,000\",\n      \"type\": \"FULL_TIME\",\n      \"active\": true\n    },\n    \"candidate\": {\n      \"id\": 2,\n      \"email\": \"johndoe@test.com\",\n      \"fullName\": \"John Doe\",\n      \"role\": \"CANDIDATE\"\n    },\n    \"status\": \"PENDING\",\n    \"coverLetter\": \"I am applying for the Full Stack Developer position as it aligns with my experience.\",\n    \"appliedAt\": \"2026-05-28T22:05:00.000\"\n  }\n}"
+      },
+      {
+        "step": "Verify application appears in the dashboard: GET http://localhost:5000/api/applications/my",
+        "requestBody": "",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Applications retrieved\",\n  \"data\": [\n    {\n      \"id\": 10,\n      \"job\": {\n        \"id\": 3,\n        \"title\": \"Full Stack Developer\",\n        \"location\": \"Bangalore, India\",\n        \"company\": \"CloudNine Technologies\"\n      },\n      \"candidate\": {\n        \"id\": 2,\n        \"email\": \"johndoe@test.com\",\n        \"fullName\": \"John Doe\",\n        \"role\": \"CANDIDATE\"\n      },\n      \"status\": \"PENDING\",\n      \"appliedAt\": \"2026-05-28T22:05:00.000\"\n    }\n  ]\n}"
+      }
+    ]
+  },
+  {
+    "slNo": "3",
+    "testCaseId": "TC_HMS_003",
+    "testCaseName": "Apply for a Job Based on Location",
+    "testCaseDescription": "Verify that a candidate can search jobs by location, extract the jobId, apply for the job, and confirm the application appears in the dashboard with status PENDING",
+    "steps": [
+      {
+        "step": "Login with candidate credentials: POST http://localhost:5000/api/auth/login",
+        "requestBody": "{\n  \"email\": \"johndoe@test.com\",\n  \"password\": \"Pass@123\"\n}",
+        "responseBody": "{\n  \"success\": true,\n  \"data\": {\n    \"accessToken\": \"eyJhbGciOiJIUzI1NiJ9...\",\n    \"id\": 2,\n    \"email\": \"johndoe@test.com\",\n    \"fullName\": \"John Doe\",\n    \"role\": \"CANDIDATE\"\n  }\n}"
+      },
+      {
+        "step": "Search jobs by location: GET http://localhost:5000/api/jobs?location=Bangalore%2C%20India",
+        "requestBody": "http://localhost:5000/api/jobs?location=Bangalore%2C%20India",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Jobs retrieved\",\n  \"data\": [\n    {\n      \"id\": 1,\n      \"title\": \"Software Developer\",\n      \"description\": \"Java backend developer role\",\n      \"location\": \"Bangalore, India\",\n      \"company\": \"TechCorp Solutions\",\n      \"salary\": \"8,00,000 - 15,00,000\",\n      \"type\": \"FULL_TIME\",\n      \"active\": true\n    },\n    {\n      \"id\": 3,\n      \"title\": \"Full Stack Developer\",\n      \"description\": \"Full Stack Developer role at CloudNine Technologies\",\n      \"location\": \"Bangalore, India\",\n      \"company\": \"CloudNine Technologies\",\n      \"salary\": \"12,00,000 - 20,00,000\",\n      \"type\": \"FULL_TIME\",\n      \"active\": true\n    }\n  ]\n}"
+      },
+      {
+        "step": "Extract jobId of the preferred job from the location-based search response",
+        "requestBody": "",
+        "responseBody": "jobId = 1 (extracted from data[0].id where location = Bangalore, India)"
+      },
+      {
+        "step": "Apply for the job: POST http://localhost:5000/api/applications",
+        "requestBody": "{\n  \"jobId\": 1,\n  \"coverLetter\": \"I am interested in the Software Developer role in Bangalore at TechCorp Solutions.\"\n}",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Application submitted\",\n  \"data\": {\n    \"id\": 11,\n    \"job\": {\n      \"id\": 1,\n      \"title\": \"Software Developer\",\n      \"location\": \"Bangalore, India\",\n      \"company\": \"TechCorp Solutions\",\n      \"salary\": \"8,00,000 - 15,00,000\",\n      \"type\": \"FULL_TIME\",\n      \"active\": true\n    },\n    \"candidate\": {\n      \"id\": 2,\n      \"email\": \"johndoe@test.com\",\n      \"fullName\": \"John Doe\",\n      \"role\": \"CANDIDATE\"\n    },\n    \"status\": \"PENDING\",\n    \"coverLetter\": \"I am interested in the Software Developer role in Bangalore at TechCorp Solutions.\",\n    \"appliedAt\": \"2026-05-28T22:10:00.000\"\n  }\n}"
+      },
+      {
+        "step": "Verify application appears in the dashboard: GET http://localhost:5000/api/applications/my",
+        "requestBody": "",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Applications retrieved\",\n  \"data\": [\n    {\n      \"id\": 11,\n      \"job\": {\n        \"id\": 1,\n        \"title\": \"Software Developer\",\n        \"location\": \"Bangalore, India\",\n        \"company\": \"TechCorp Solutions\"\n      },\n      \"candidate\": {\n        \"id\": 2,\n        \"email\": \"johndoe@test.com\",\n        \"fullName\": \"John Doe\",\n        \"role\": \"CANDIDATE\"\n      },\n      \"status\": \"PENDING\",\n      \"appliedAt\": \"2026-05-28T22:10:00.000\"\n    }\n  ]\n}"
+      }
+    ]
+  },
+  {
+    "slNo": "4",
+    "testCaseId": "TC_HMS_004",
+    "testCaseName": "Apply for a Job with Highest Salary",
+    "testCaseDescription": "Verify that a candidate can search jobs sorted by salary descending, apply for the top result (highest salary), and confirm the application appears in the dashboard with status PENDING",
+    "steps": [
+      {
+        "step": "Login with candidate credentials: POST http://localhost:5000/api/auth/login",
+        "requestBody": "{\n  \"email\": \"johndoe@test.com\",\n  \"password\": \"Pass@123\"\n}",
+        "responseBody": "{\n  \"success\": true,\n  \"data\": {\n    \"accessToken\": \"eyJhbGciOiJIUzI1NiJ9...\",\n    \"id\": 2,\n    \"email\": \"johndoe@test.com\",\n    \"fullName\": \"John Doe\",\n    \"role\": \"CANDIDATE\"\n  }\n}"
+      },
+      {
+        "step": "Search jobs sorted by salary descending: GET http://localhost:5000/api/jobs?company=CloudNine%20Technologies&title=Full%20Stack%20Developer&location=Bangalore%2C%20India&sortBy=salary&order=desc",
+        "requestBody": "http://localhost:5000/api/jobs?company=CloudNine%20Technologies&title=Full%20Stack%20Developer&location=Bangalore%2C%20India&sortBy=salary&order=desc",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Jobs retrieved\",\n  \"data\": [\n    {\n      \"id\": 5,\n      \"title\": \"Full Stack Developer\",\n      \"description\": \"Senior Full Stack Developer role\",\n      \"location\": \"Bangalore, India\",\n      \"company\": \"CloudNine Technologies\",\n      \"salary\": \"20,00,000 - 30,00,000\",\n      \"type\": \"FULL_TIME\",\n      \"active\": true\n    },\n    {\n      \"id\": 3,\n      \"title\": \"Full Stack Developer\",\n      \"description\": \"Mid-level Full Stack Developer role\",\n      \"location\": \"Bangalore, India\",\n      \"company\": \"CloudNine Technologies\",\n      \"salary\": \"12,00,000 - 20,00,000\",\n      \"type\": \"FULL_TIME\",\n      \"active\": true\n    }\n  ]\n}"
+      },
+      {
+        "step": "Extract jobId of the top result (highest salary) from the search response",
+        "requestBody": "",
+        "responseBody": "jobId = 5 (extracted from data[0].id — highest salary: 20,00,000 - 30,00,000)"
+      },
+      {
+        "step": "Apply for the highest salary job: POST http://localhost:5000/api/applications",
+        "requestBody": "{\n  \"jobId\": 5,\n  \"coverLetter\": \"I am applying for the senior Full Stack Developer role at CloudNine Technologies — the highest salary match for my profile.\"\n}",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Application submitted\",\n  \"data\": {\n    \"id\": 12,\n    \"job\": {\n      \"id\": 5,\n      \"title\": \"Full Stack Developer\",\n      \"location\": \"Bangalore, India\",\n      \"company\": \"CloudNine Technologies\",\n      \"salary\": \"20,00,000 - 30,00,000\",\n      \"type\": \"FULL_TIME\",\n      \"active\": true\n    },\n    \"candidate\": {\n      \"id\": 2,\n      \"email\": \"johndoe@test.com\",\n      \"fullName\": \"John Doe\",\n      \"role\": \"CANDIDATE\"\n    },\n    \"status\": \"PENDING\",\n    \"coverLetter\": \"I am applying for the senior Full Stack Developer role at CloudNine Technologies — the highest salary match for my profile.\",\n    \"appliedAt\": \"2026-05-28T22:15:00.000\"\n  }\n}"
+      },
+      {
+        "step": "Verify application appears in the dashboard: GET http://localhost:5000/api/applications/my",
+        "requestBody": "",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Applications retrieved\",\n  \"data\": [\n    {\n      \"id\": 12,\n      \"job\": {\n        \"id\": 5,\n        \"title\": \"Full Stack Developer\",\n        \"location\": \"Bangalore, India\",\n        \"company\": \"CloudNine Technologies\",\n        \"salary\": \"20,00,000 - 30,00,000\"\n      },\n      \"candidate\": {\n        \"id\": 2,\n        \"email\": \"johndoe@test.com\",\n        \"fullName\": \"John Doe\",\n        \"role\": \"CANDIDATE\"\n      },\n      \"status\": \"PENDING\",\n      \"appliedAt\": \"2026-05-28T22:15:00.000\"\n    }\n  ]\n}"
+      }
+    ]
+  },
+  {
+    "slNo": "5",
+    "testCaseId": "TC_HMS_005",
+    "testCaseName": "Apply for Same Job Twice",
+    "testCaseDescription": "Verify that applying to the same jobId twice returns 409 Conflict as per the duplicate application business rule",
+    "steps": [
+      {
+        "step": "Login with candidate credentials: POST http://localhost:5000/api/auth/login",
+        "requestBody": "{\n  \"email\": \"johndoe@test.com\",\n  \"password\": \"Pass@123\"\n}",
+        "responseBody": "{\n  \"success\": true,\n  \"data\": {\n    \"accessToken\": \"eyJhbGciOiJIUzI1NiJ9...\",\n    \"id\": 2,\n    \"email\": \"johndoe@test.com\",\n    \"fullName\": \"John Doe\",\n    \"role\": \"CANDIDATE\"\n  }\n}"
+      },
+      {
+        "step": "Apply for the job first time: POST http://localhost:5000/api/applications",
+        "requestBody": "{\n  \"jobId\": 3,\n  \"coverLetter\": \"First application for Full Stack Developer at CloudNine Technologies.\"\n}",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Application submitted\",\n  \"data\": {\n    \"id\": 9,\n    \"job\": {\n      \"id\": 3,\n      \"title\": \"Full Stack Developer\",\n      \"company\": \"CloudNine Technologies\"\n    },\n    \"status\": \"PENDING\",\n    \"appliedAt\": \"2026-05-28T22:00:00.000\"\n  }\n}"
+      },
+      {
+        "step": "Apply for the same job again: POST http://localhost:5000/api/applications",
+        "requestBody": "{\n  \"jobId\": 3,\n  \"coverLetter\": \"Second attempt to apply for the same job.\"\n}",
+        "responseBody": "{\n  \"success\": false,\n  \"status\": 409,\n  \"message\": \"You have already applied for this job\"\n}"
+      }
+    ]
+  },
+  {
+    "slNo": "6",
+    "testCaseId": "TC_HMS_006",
+    "testCaseName": "View All Applied Jobs Dashboard",
+    "testCaseDescription": "Verify that GET /api/applications/my returns all submitted applications with job title, company, location, status and appliedAt for the logged-in candidate",
+    "steps": [
+      {
+        "step": "Login with candidate credentials: POST http://localhost:5000/api/auth/login",
+        "requestBody": "{\n  \"email\": \"johndoe@test.com\",\n  \"password\": \"Pass@123\"\n}",
+        "responseBody": "{\n  \"success\": true,\n  \"data\": {\n    \"accessToken\": \"eyJhbGciOiJIUzI1NiJ9...\",\n    \"id\": 2,\n    \"email\": \"johndoe@test.com\",\n    \"fullName\": \"John Doe\",\n    \"role\": \"CANDIDATE\"\n  }\n}"
+      },
+      {
+        "step": "Retrieve all applications for the logged-in candidate: GET http://localhost:5000/api/applications/my",
+        "requestBody": "",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Applications retrieved\",\n  \"data\": [\n    {\n      \"id\": 9,\n      \"job\": {\n        \"id\": 3,\n        \"title\": \"Full Stack Developer\",\n        \"location\": \"Bangalore, India\",\n        \"company\": \"CloudNine Technologies\",\n        \"salary\": \"12,00,000 - 20,00,000\",\n        \"type\": \"FULL_TIME\",\n        \"active\": true\n      },\n      \"candidate\": {\n        \"id\": 2,\n        \"email\": \"johndoe@test.com\",\n        \"fullName\": \"John Doe\",\n        \"role\": \"CANDIDATE\"\n      },\n      \"status\": \"PENDING\",\n      \"coverLetter\": \"I am applying for the Full Stack Developer role at CloudNine Technologies.\",\n      \"appliedAt\": \"2026-05-28T22:00:00.000\"\n    },\n    {\n      \"id\": 11,\n      \"job\": {\n        \"id\": 1,\n        \"title\": \"Software Developer\",\n        \"location\": \"Bangalore, India\",\n        \"company\": \"TechCorp Solutions\",\n        \"salary\": \"8,00,000 - 15,00,000\",\n        \"type\": \"FULL_TIME\",\n        \"active\": true\n      },\n      \"candidate\": {\n        \"id\": 2,\n        \"email\": \"johndoe@test.com\",\n        \"fullName\": \"John Doe\",\n        \"role\": \"CANDIDATE\"\n      },\n      \"status\": \"REVIEWED\",\n      \"coverLetter\": \"I am interested in the Software Developer role in Bangalore at TechCorp Solutions.\",\n      \"appliedAt\": \"2026-05-27T10:30:00.000\"\n    }\n  ]\n}"
+      },
+      {
+        "step": "Verify each entry contains job.title, job.company, job.location, status and appliedAt",
+        "requestBody": "",
+        "responseBody": "Each entry has: job.title, job.company, job.location, status in [PENDING, REVIEWED, SHORTLISTED, ACCEPTED, REJECTED], appliedAt in ISO format (YYYY-MM-DDTHH:mm:ss)"
+      }
+    ]
+  },
+  {
+    "slNo": "7",
+    "testCaseId": "TC_HMS_007",
+    "testCaseName": "E2E: Search by All Parameters, Apply and View Dashboard",
+    "testCaseDescription": "End-to-end flow: login as candidate, search for Full Stack Developer at CloudNine Technologies in Bangalore sorted by highest salary, apply for the top result, and verify the application appears in the dashboard with status PENDING",
+    "steps": [
+      {
+        "step": "Login with candidate credentials: POST http://localhost:5000/api/auth/login",
+        "requestBody": "{\n  \"email\": \"johndoe@test.com\",\n  \"password\": \"Pass@123\"\n}",
+        "responseBody": "{\n  \"success\": true,\n  \"data\": {\n    \"accessToken\": \"eyJhbGciOiJIUzI1NiJ9...\",\n    \"id\": 2,\n    \"email\": \"johndoe@test.com\",\n    \"fullName\": \"John Doe\",\n    \"role\": \"CANDIDATE\"\n  }\n}"
+      },
+      {
+        "step": "Search jobs using all parameters sorted by salary desc: GET http://localhost:5000/api/jobs?company=CloudNine%20Technologies&title=Full%20Stack%20Developer&location=Bangalore%2C%20India&sortBy=salary&order=desc",
+        "requestBody": "http://localhost:5000/api/jobs?company=CloudNine%20Technologies&title=Full%20Stack%20Developer&location=Bangalore%2C%20India&sortBy=salary&order=desc",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Jobs retrieved\",\n  \"data\": [\n    {\n      \"id\": 5,\n      \"title\": \"Full Stack Developer\",\n      \"description\": \"Senior Full Stack Developer role\",\n      \"location\": \"Bangalore, India\",\n      \"company\": \"CloudNine Technologies\",\n      \"salary\": \"20,00,000 - 30,00,000\",\n      \"type\": \"FULL_TIME\",\n      \"active\": true\n    }\n  ]\n}"
+      },
+      {
+        "step": "Extract top-result jobId (highest salary) from the search response",
+        "requestBody": "",
+        "responseBody": "jobId = 5 (top result: salary = 20,00,000 - 30,00,000, company = CloudNine Technologies)"
+      },
+      {
+        "step": "Apply for the top-result job: POST http://localhost:5000/api/applications",
+        "requestBody": "{\n  \"jobId\": 5,\n  \"coverLetter\": \"I am applying for the senior Full Stack Developer role at CloudNine Technologies based on the best salary match.\"\n}",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Application submitted\",\n  \"data\": {\n    \"id\": 13,\n    \"job\": {\n      \"id\": 5,\n      \"title\": \"Full Stack Developer\",\n      \"location\": \"Bangalore, India\",\n      \"company\": \"CloudNine Technologies\",\n      \"salary\": \"20,00,000 - 30,00,000\",\n      \"type\": \"FULL_TIME\",\n      \"active\": true\n    },\n    \"candidate\": {\n      \"id\": 2,\n      \"email\": \"johndoe@test.com\",\n      \"fullName\": \"John Doe\",\n      \"role\": \"CANDIDATE\"\n    },\n    \"status\": \"PENDING\",\n    \"coverLetter\": \"I am applying for the senior Full Stack Developer role at CloudNine Technologies based on the best salary match.\",\n    \"appliedAt\": \"2026-05-28T22:20:00.000\"\n  }\n}"
+      },
+      {
+        "step": "Verify the new application appears in the dashboard: GET http://localhost:5000/api/applications/my",
+        "requestBody": "",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Applications retrieved\",\n  \"data\": [\n    {\n      \"id\": 13,\n      \"job\": {\n        \"id\": 5,\n        \"title\": \"Full Stack Developer\",\n        \"location\": \"Bangalore, India\",\n        \"company\": \"CloudNine Technologies\",\n        \"salary\": \"20,00,000 - 30,00,000\"\n      },\n      \"candidate\": {\n        \"id\": 2,\n        \"email\": \"johndoe@test.com\",\n        \"fullName\": \"John Doe\",\n        \"role\": \"CANDIDATE\"\n      },\n      \"status\": \"PENDING\",\n      \"appliedAt\": \"2026-05-28T22:20:00.000\"\n    }\n  ]\n}"
+      }
+    ]
+  }
+]
+
