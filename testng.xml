@@ -2,10 +2,22 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
 <suite name="HiringManagementSystem API Test Suite" verbose="1">
 
+    <!-- ── Extent Report Listener — generates reports/ExtentReport.html ── -->
+    <listeners>
+        <listener class-name="com.hiring.utils.ExtentReportManager"/>
+    </listeners>
 
-    <test name="Smoke">
+    <!-- Multi-method approach: 22 @Test methods with dependsOnMethods -->
+    <test name="Userstory3 - Multi-Method">
         <classes>
-            <class name="com.hiring.tests.SampleTest"/>
+            <class name="com.hiring.tests.Userstory3EndToEndTest"/>
+        </classes>
+    </test>
+
+    <!-- Single-method approach: all 22 steps inlined in one @Test -->
+    <test name="Userstory3 - Single Test">
+        <classes>
+            <class name="com.hiring.tests.Userstory3E2ESingleTest"/>
         </classes>
     </test>
 

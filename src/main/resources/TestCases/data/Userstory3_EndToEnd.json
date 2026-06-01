@@ -1,0 +1,126 @@
+[
+  {
+    "slNo": "1",
+    "testCaseId": "TC_US3_001",
+    "testCaseName": "E2E: Full Hiring Lifecycle with Multiple Jobs, Candidates and Cascading Selections",
+    "testCaseDescription": "End-to-end hiring lifecycle: Admin/Recruiter/Candidate registration, multiple job creations, multi-job applications, duplicate prevention, multi-stage status updates, cascading selection (selected=SELECTED, others=REJECTED, job=deactivated), cross-job isolation, multi-recruiter independence, post-closure blocking, job deletion and admin user deletion with auth verification",
+    "steps": [
+      {
+        "step": "Register Admin user: POST http://localhost:5000/api/auth/register",
+        "requestBody": "{\n  \"email\": \"admin@test.com\",\n  \"password\": \"admin123\",\n  \"fullName\": \"Admin User\",\n  \"phone\": \"9000000001\",\n  \"role\": \"ADMIN\"\n}",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"User registered successfully\",\n  \"data\": {\n    \"id\": 1,\n    \"email\": \"admin@test.com\",\n    \"fullName\": \"Admin User\",\n    \"role\": \"ADMIN\"\n  }\n}"
+      },
+      {
+        "step": "Register Recruiter 1 (Jaydeep): POST http://localhost:5000/api/auth/register",
+        "requestBody": "{\n  \"email\": \"jaydeep@test.com\",\n  \"password\": \"pass123\",\n  \"fullName\": \"Jaydeep Recruiter\",\n  \"phone\": \"9000000002\",\n  \"role\": \"RECRUITER\"\n}",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"User registered successfully\",\n  \"data\": {\n    \"id\": 2,\n    \"email\": \"jaydeep@test.com\",\n    \"fullName\": \"Jaydeep Recruiter\",\n    \"role\": \"RECRUITER\"\n  }\n}"
+      },
+      {
+        "step": "Register Recruiter 2 (Smitha): POST http://localhost:5000/api/auth/register",
+        "requestBody": "{\n  \"email\": \"smitha@test.com\",\n  \"password\": \"pass123\",\n  \"fullName\": \"Smitha Recruiter\",\n  \"phone\": \"9000000003\",\n  \"role\": \"RECRUITER\"\n}",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"User registered successfully\",\n  \"data\": {\n    \"id\": 3,\n    \"email\": \"smitha@test.com\",\n    \"fullName\": \"Smitha Recruiter\",\n    \"role\": \"RECRUITER\"\n  }\n}"
+      },
+      {
+        "step": "Register Candidate 1 (Manik), Candidate 2 (Prajwal), Candidate 3 (Omkar): POST http://localhost:5000/api/auth/register (x3)",
+        "requestBody": "{\n  \"email\": \"manik@test.com\",\n  \"password\": \"pass123\",\n  \"fullName\": \"Manik Candidate\",\n  \"phone\": \"9000000004\",\n  \"role\": \"CANDIDATE\"\n}",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"User registered successfully\",\n  \"data\": { \"id\": 4, \"email\": \"manik@test.com\", \"fullName\": \"Manik Candidate\", \"role\": \"CANDIDATE\" }\n}\n// Repeated for prajwal@test.com (id=5) and omkar@test.com (id=6)"
+      },
+      {
+        "step": "Admin logs in and views all registered users: GET http://localhost:5000/api/admin/users",
+        "requestBody": "{\n  \"email\": \"admin@test.com\",\n  \"password\": \"admin123\"\n}",
+        "responseBody": "{\n  \"success\": true,\n  \"data\": [\n    { \"id\": 1, \"email\": \"admin@test.com\", \"role\": \"ADMIN\" },\n    { \"id\": 2, \"email\": \"jaydeep@test.com\", \"role\": \"RECRUITER\" },\n    { \"id\": 3, \"email\": \"smitha@test.com\", \"role\": \"RECRUITER\" },\n    { \"id\": 4, \"email\": \"manik@test.com\", \"role\": \"CANDIDATE\" },\n    { \"id\": 5, \"email\": \"prajwal@test.com\", \"role\": \"CANDIDATE\" },\n    { \"id\": 6, \"email\": \"omkar@test.com\", \"role\": \"CANDIDATE\" }\n  ]\n}"
+      },
+      {
+        "step": "Recruiter 1 (Jaydeep) logs in and creates Job 1 (Backend Engineer): POST http://localhost:5000/api/jobs",
+        "requestBody": "{\n  \"title\": \"Backend Engineer\",\n  \"description\": \"Java Spring Boot developer\",\n  \"location\": \"Bangalore, India\",\n  \"company\": \"CloudNine Technologies\",\n  \"salary\": \"12,00,000 - 18,00,000\",\n  \"type\": \"FULL_TIME\"\n}",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Job created successfully\",\n  \"data\": {\n    \"id\": 1,\n    \"title\": \"Backend Engineer\",\n    \"company\": \"CloudNine Technologies\",\n    \"active\": true\n  }\n}"
+      },
+      {
+        "step": "Recruiter 1 creates Job 2 (Frontend Developer): POST http://localhost:5000/api/jobs",
+        "requestBody": "{\n  \"title\": \"Frontend Developer\",\n  \"description\": \"React.js developer\",\n  \"location\": \"Hyderabad, India\",\n  \"company\": \"CloudNine Technologies\",\n  \"salary\": \"10,00,000 - 15,00,000\",\n  \"type\": \"FULL_TIME\"\n}",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Job created successfully\",\n  \"data\": {\n    \"id\": 2,\n    \"title\": \"Frontend Developer\",\n    \"company\": \"CloudNine Technologies\",\n    \"active\": true\n  }\n}"
+      },
+      {
+        "step": "Recruiter 2 (Smitha) logs in and creates Job 3 (Data Analyst): POST http://localhost:5000/api/jobs",
+        "requestBody": "{\n  \"title\": \"Data Analyst\",\n  \"description\": \"Python and SQL data analyst\",\n  \"location\": \"Chennai, India\",\n  \"company\": \"InfoSystems Ltd\",\n  \"salary\": \"8,00,000 - 12,00,000\",\n  \"type\": \"FULL_TIME\"\n}",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Job created successfully\",\n  \"data\": {\n    \"id\": 3,\n    \"title\": \"Data Analyst\",\n    \"company\": \"InfoSystems Ltd\",\n    \"active\": true\n  }\n}"
+      },
+      {
+        "step": "Verify all 3 jobs are active and visible in listings: GET http://localhost:5000/api/jobs",
+        "requestBody": "http://localhost:5000/api/jobs",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Jobs retrieved\",\n  \"data\": [\n    { \"id\": 1, \"title\": \"Backend Engineer\", \"company\": \"CloudNine Technologies\", \"active\": true },\n    { \"id\": 2, \"title\": \"Frontend Developer\", \"company\": \"CloudNine Technologies\", \"active\": true },\n    { \"id\": 3, \"title\": \"Data Analyst\", \"company\": \"InfoSystems Ltd\", \"active\": true }\n  ]\n}"
+      },
+      {
+        "step": "Candidate 1 (Manik) applies to Job 1 and Job 2 simultaneously: POST http://localhost:5000/api/applications (x2)",
+        "requestBody": "{\n  \"jobId\": 1,\n  \"coverLetter\": \"Manik applying for Backend Engineer at CloudNine.\"\n}\n// Then: { \"jobId\": 2, \"coverLetter\": \"Manik applying for Frontend Developer at CloudNine.\" }",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Application submitted\",\n  \"data\": {\n    \"id\": 1,\n    \"job\": { \"id\": 1, \"title\": \"Backend Engineer\" },\n    \"candidate\": { \"id\": 4, \"email\": \"manik@test.com\" },\n    \"status\": \"PENDING\",\n    \"appliedAt\": \"2026-05-29T11:00:00.000\"\n  }\n}\n// Application id=2: jobId=2, status=PENDING"
+      },
+      {
+        "step": "Candidate 1 (Manik) attempts duplicate apply to Job 1 — expects 409 Conflict: POST http://localhost:5000/api/applications",
+        "requestBody": "{\n  \"jobId\": 1,\n  \"coverLetter\": \"Duplicate application attempt.\"\n}",
+        "responseBody": "{\n  \"success\": false,\n  \"status\": 409,\n  \"message\": \"You have already applied for this job\"\n}"
+      },
+      {
+        "step": "Candidate 2 (Prajwal) applies to Job 1 and Job 3; Candidate 3 (Omkar) applies to Job 2 and Job 3: POST http://localhost:5000/api/applications (x4)",
+        "requestBody": "{\n  \"jobId\": 1,\n  \"coverLetter\": \"Prajwal applying for Backend Engineer.\"\n}\n// Prajwal also: jobId=3 | Omkar: jobId=2, jobId=3",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Application submitted\",\n  \"data\": [\n    { \"id\": 3, \"candidate\": { \"email\": \"prajwal@test.com\" }, \"job\": { \"id\": 1 }, \"status\": \"PENDING\" },\n    { \"id\": 4, \"candidate\": { \"email\": \"prajwal@test.com\" }, \"job\": { \"id\": 3 }, \"status\": \"PENDING\" },\n    { \"id\": 5, \"candidate\": { \"email\": \"omkar@test.com\" }, \"job\": { \"id\": 2 }, \"status\": \"PENDING\" },\n    { \"id\": 6, \"candidate\": { \"email\": \"omkar@test.com\" }, \"job\": { \"id\": 3 }, \"status\": \"PENDING\" }\n  ]\n}"
+      },
+      {
+        "step": "Recruiter 1 views applications for Job 1 only (isolation check): GET http://localhost:5000/api/applications/job/1",
+        "requestBody": "http://localhost:5000/api/applications/job/1",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Applications retrieved\",\n  \"data\": [\n    { \"id\": 1, \"candidate\": { \"email\": \"manik@test.com\" }, \"status\": \"PENDING\" },\n    { \"id\": 3, \"candidate\": { \"email\": \"prajwal@test.com\" }, \"status\": \"PENDING\" }\n  ]\n}"
+      },
+      {
+        "step": "Recruiter 1 updates Manik's Job 1 application to INTERVIEW_SCHEDULED, Prajwal's to ON_HOLD: PUT http://localhost:5000/api/applications/{id}/status",
+        "requestBody": "http://localhost:5000/api/applications/1/status?status=INTERVIEW_SCHEDULED\n// Then: http://localhost:5000/api/applications/3/status?status=ON_HOLD",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Application status updated\",\n  \"data\": { \"id\": 1, \"status\": \"INTERVIEW_SCHEDULED\", \"candidate\": { \"email\": \"manik@test.com\" } }\n}\n// app id=3: status = ON_HOLD"
+      },
+      {
+        "step": "Candidate 1 (Manik) verifies dashboard shows INTERVIEW_SCHEDULED for Job 1 and PENDING for Job 2 (real-time + cross-job isolation): GET http://localhost:5000/api/applications/my",
+        "requestBody": "",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Applications retrieved\",\n  \"data\": [\n    {\n      \"id\": 1,\n      \"job\": { \"id\": 1, \"title\": \"Backend Engineer\", \"company\": \"CloudNine Technologies\" },\n      \"status\": \"INTERVIEW_SCHEDULED\",\n      \"appliedAt\": \"2026-05-29T11:00:00.000\"\n    },\n    {\n      \"id\": 2,\n      \"job\": { \"id\": 2, \"title\": \"Frontend Developer\", \"company\": \"CloudNine Technologies\" },\n      \"status\": \"PENDING\",\n      \"appliedAt\": \"2026-05-29T11:01:00.000\"\n    }\n  ]\n}"
+      },
+      {
+        "step": "Recruiter 1 selects Manik for Job 1 — triggers auto-rejection of Prajwal and job deactivation: PUT http://localhost:5000/api/applications/1/status?status=SELECTED",
+        "requestBody": "http://localhost:5000/api/applications/1/status?status=SELECTED",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Application status updated. Job closed and remaining applicants rejected.\",\n  \"data\": {\n    \"id\": 1,\n    \"candidate\": { \"id\": 4, \"email\": \"manik@test.com\" },\n    \"status\": \"SELECTED\",\n    \"job\": {\n      \"id\": 1,\n      \"title\": \"Backend Engineer\",\n      \"active\": false\n    }\n  }\n}"
+      },
+      {
+        "step": "Verify Prajwal auto-REJECTED for Job 1 and Job 1 deactivated; Manik's Job 2 still PENDING (cross-job isolation): GET http://localhost:5000/api/applications/job/1 + GET http://localhost:5000/api/jobs",
+        "requestBody": "http://localhost:5000/api/applications/job/1\n// Then: http://localhost:5000/api/jobs",
+        "responseBody": "{\n  \"success\": true,\n  \"data\": [\n    { \"id\": 1, \"candidate\": { \"email\": \"manik@test.com\" }, \"status\": \"SELECTED\" },\n    { \"id\": 3, \"candidate\": { \"email\": \"prajwal@test.com\" }, \"status\": \"REJECTED\" }\n  ]\n}\n// GET /api/jobs: Job 1 no longer in active listings; Job 2 and Job 3 still active\n// Manik GET /api/applications/my: Job 1 = SELECTED, Job 2 = PENDING (unchanged)"
+      },
+      {
+        "step": "Recruiter 2 (Smitha) independently selects Prajwal for Job 3 — cascading rejection of Omkar for Job 3, Job 3 deactivated: PUT http://localhost:5000/api/applications/4/status?status=SELECTED",
+        "requestBody": "http://localhost:5000/api/applications/4/status?status=SELECTED",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Application status updated. Job closed and remaining applicants rejected.\",\n  \"data\": {\n    \"id\": 4,\n    \"candidate\": { \"id\": 5, \"email\": \"prajwal@test.com\" },\n    \"status\": \"SELECTED\",\n    \"job\": {\n      \"id\": 3,\n      \"title\": \"Data Analyst\",\n      \"active\": false\n    }\n  }\n}"
+      },
+      {
+        "step": "New candidate attempts to apply for closed Job 1 — expects 400 error: POST http://localhost:5000/api/applications",
+        "requestBody": "{\n  \"jobId\": 1,\n  \"coverLetter\": \"Attempting to apply for closed Backend Engineer role.\"\n}",
+        "responseBody": "{\n  \"success\": false,\n  \"status\": 400,\n  \"message\": \"This position has been filled\"\n}"
+      },
+      {
+        "step": "Recruiter 1 deletes Job 2 (Frontend Developer) — job removed from listings: DELETE http://localhost:5000/api/jobs/2",
+        "requestBody": "http://localhost:5000/api/jobs/2",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Job deleted successfully\"\n}"
+      },
+      {
+        "step": "Verify Job 2 no longer in listings and no active jobs remain: GET http://localhost:5000/api/jobs",
+        "requestBody": "http://localhost:5000/api/jobs",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Jobs retrieved\",\n  \"data\": []\n}"
+      },
+      {
+        "step": "Admin deletes Candidate 3 (Omkar): DELETE http://localhost:5000/api/admin/users/6",
+        "requestBody": "http://localhost:5000/api/admin/users/6",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"User deleted successfully\"\n}"
+      },
+      {
+        "step": "Verify deleted Candidate 3 (Omkar) can no longer authenticate: POST http://localhost:5000/api/auth/login",
+        "requestBody": "{\n  \"email\": \"omkar@test.com\",\n  \"password\": \"pass123\"\n}",
+        "responseBody": "{\n  \"success\": false,\n  \"status\": 401,\n  \"message\": \"Invalid credentials or user not found\"\n}"
+      }
+    ]
+  }
+]
+

@@ -1,0 +1,71 @@
+[
+  {
+    "slNo": "1",
+    "testCaseId": "TC_US1_001",
+    "testCaseName": "E2E: Recruiter Selects Candidate, Auto-Rejects Others and Closes Job",
+    "testCaseDescription": "End-to-end flow: Recruiter creates a job, two candidates apply (status=PENDING), recruiter selects one candidate (status=SELECTED), system auto-rejects remaining applicants (status=REJECTED), job is automatically deactivated, and a new candidate attempting to apply receives 'This position has been filled' error",
+    "steps": [
+      {
+        "step": "Login as recruiter: POST http://localhost:5000/api/auth/login",
+        "requestBody": "{\n  \"email\": \"jaydeep@test.com\",\n  \"password\": \"pass123\"\n}",
+        "responseBody": "{\n  \"success\": true,\n  \"data\": {\n    \"accessToken\": \"eyJhbGciOiJIUzI1NiJ9...\",\n    \"id\": 3,\n    \"email\": \"jaydeep@test.com\",\n    \"fullName\": \"Jaydeep Recruiter\",\n    \"role\": \"RECRUITER\"\n  }\n}"
+      },
+      {
+        "step": "Recruiter creates an active job posting: POST http://localhost:5000/api/jobs",
+        "requestBody": "{\n  \"title\": \"Backend Engineer\",\n  \"description\": \"Java Spring Boot developer for cloud applications\",\n  \"location\": \"Bangalore, India\",\n  \"company\": \"CloudNine Technologies\",\n  \"salary\": \"12,00,000 - 18,00,000\",\n  \"type\": \"FULL_TIME\"\n}",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Job created successfully\",\n  \"data\": {\n    \"id\": 10,\n    \"title\": \"Backend Engineer\",\n    \"description\": \"Java Spring Boot developer for cloud applications\",\n    \"location\": \"Bangalore, India\",\n    \"company\": \"CloudNine Technologies\",\n    \"salary\": \"12,00,000 - 18,00,000\",\n    \"type\": \"FULL_TIME\",\n    \"active\": true\n  }\n}"
+      },
+      {
+        "step": "Login as Candidate 1 (manik@test.com): POST http://localhost:5000/api/auth/login",
+        "requestBody": "{\n  \"email\": \"manik@test.com\",\n  \"password\": \"pass123\"\n}",
+        "responseBody": "{\n  \"success\": true,\n  \"data\": {\n    \"accessToken\": \"eyJhbGciOiJIUzI1NiJ9...\",\n    \"id\": 4,\n    \"email\": \"manik@test.com\",\n    \"fullName\": \"Manik Candidate\",\n    \"role\": \"CANDIDATE\"\n  }\n}"
+      },
+      {
+        "step": "Candidate 1 applies for the job (status = PENDING): POST http://localhost:5000/api/applications",
+        "requestBody": "{\n  \"jobId\": 10,\n  \"coverLetter\": \"I am Manik, applying for the Backend Engineer role at CloudNine Technologies.\"\n}",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Application submitted\",\n  \"data\": {\n    \"id\": 21,\n    \"job\": {\n      \"id\": 10,\n      \"title\": \"Backend Engineer\",\n      \"company\": \"CloudNine Technologies\",\n      \"active\": true\n    },\n    \"candidate\": {\n      \"id\": 4,\n      \"email\": \"manik@test.com\",\n      \"fullName\": \"Manik Candidate\",\n      \"role\": \"CANDIDATE\"\n    },\n    \"status\": \"PENDING\",\n    \"appliedAt\": \"2026-05-29T10:00:00.000\"\n  }\n}"
+      },
+      {
+        "step": "Login as Candidate 2 (johndoe@test.com): POST http://localhost:5000/api/auth/login",
+        "requestBody": "{\n  \"email\": \"johndoe@test.com\",\n  \"password\": \"Pass@123\"\n}",
+        "responseBody": "{\n  \"success\": true,\n  \"data\": {\n    \"accessToken\": \"eyJhbGciOiJIUzI1NiJ9...\",\n    \"id\": 2,\n    \"email\": \"johndoe@test.com\",\n    \"fullName\": \"John Doe\",\n    \"role\": \"CANDIDATE\"\n  }\n}"
+      },
+      {
+        "step": "Candidate 2 applies for the same job (status = PENDING): POST http://localhost:5000/api/applications",
+        "requestBody": "{\n  \"jobId\": 10,\n  \"coverLetter\": \"I am John Doe, applying for the Backend Engineer role at CloudNine Technologies.\"\n}",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Application submitted\",\n  \"data\": {\n    \"id\": 22,\n    \"job\": {\n      \"id\": 10,\n      \"title\": \"Backend Engineer\",\n      \"company\": \"CloudNine Technologies\",\n      \"active\": true\n    },\n    \"candidate\": {\n      \"id\": 2,\n      \"email\": \"johndoe@test.com\",\n      \"fullName\": \"John Doe\",\n      \"role\": \"CANDIDATE\"\n    },\n    \"status\": \"PENDING\",\n    \"appliedAt\": \"2026-05-29T10:05:00.000\"\n  }\n}"
+      },
+      {
+        "step": "Login back as recruiter to manage applications: POST http://localhost:5000/api/auth/login",
+        "requestBody": "{\n  \"email\": \"jaydeep@test.com\",\n  \"password\": \"pass123\"\n}",
+        "responseBody": "{\n  \"success\": true,\n  \"data\": {\n    \"accessToken\": \"eyJhbGciOiJIUzI1NiJ9...\",\n    \"id\": 3,\n    \"email\": \"jaydeep@test.com\",\n    \"fullName\": \"Jaydeep Recruiter\",\n    \"role\": \"RECRUITER\"\n  }\n}"
+      },
+      {
+        "step": "Verify both applications are PENDING before selection: GET http://localhost:5000/api/applications/job/10",
+        "requestBody": "http://localhost:5000/api/applications/job/10",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Applications retrieved\",\n  \"data\": [\n    {\n      \"id\": 21,\n      \"candidate\": { \"id\": 4, \"email\": \"manik@test.com\", \"fullName\": \"Manik Candidate\" },\n      \"status\": \"PENDING\",\n      \"appliedAt\": \"2026-05-29T10:00:00.000\"\n    },\n    {\n      \"id\": 22,\n      \"candidate\": { \"id\": 2, \"email\": \"johndoe@test.com\", \"fullName\": \"John Doe\" },\n      \"status\": \"PENDING\",\n      \"appliedAt\": \"2026-05-29T10:05:00.000\"\n    }\n  ]\n}"
+      },
+      {
+        "step": "Recruiter selects Candidate 1 (Manik) — triggers auto-rejection and job closure: PUT http://localhost:5000/api/applications/21/status?status=SELECTED",
+        "requestBody": "http://localhost:5000/api/applications/21/status?status=SELECTED",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Application status updated\",\n  \"data\": {\n    \"id\": 21,\n    \"candidate\": { \"id\": 4, \"email\": \"manik@test.com\", \"fullName\": \"Manik Candidate\" },\n    \"status\": \"SELECTED\",\n    \"job\": {\n      \"id\": 10,\n      \"title\": \"Backend Engineer\",\n      \"company\": \"CloudNine Technologies\",\n      \"active\": false\n    }\n  }\n}"
+      },
+      {
+        "step": "Verify Candidate 2 (John Doe) is auto-rejected and job is deactivated: GET http://localhost:5000/api/applications/job/10",
+        "requestBody": "http://localhost:5000/api/applications/job/10",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Applications retrieved\",\n  \"data\": [\n    {\n      \"id\": 21,\n      \"candidate\": { \"id\": 4, \"email\": \"manik@test.com\", \"fullName\": \"Manik Candidate\" },\n      \"status\": \"SELECTED\",\n      \"appliedAt\": \"2026-05-29T10:00:00.000\"\n    },\n    {\n      \"id\": 22,\n      \"candidate\": { \"id\": 2, \"email\": \"johndoe@test.com\", \"fullName\": \"John Doe\" },\n      \"status\": \"REJECTED\",\n      \"appliedAt\": \"2026-05-29T10:05:00.000\"\n    }\n  ]\n}"
+      },
+      {
+        "step": "Verify job is no longer active (deactivated): GET http://localhost:5000/api/jobs/10",
+        "requestBody": "http://localhost:5000/api/jobs/10",
+        "responseBody": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": 10,\n    \"title\": \"Backend Engineer\",\n    \"company\": \"CloudNine Technologies\",\n    \"location\": \"Bangalore, India\",\n    \"salary\": \"12,00,000 - 18,00,000\",\n    \"type\": \"FULL_TIME\",\n    \"active\": false\n  }\n}"
+      },
+      {
+        "step": "Login as new Candidate 3 and attempt to apply for the closed job: POST http://localhost:5000/api/applications",
+        "requestBody": "{\n  \"jobId\": 10,\n  \"coverLetter\": \"I would like to apply for the Backend Engineer role.\"\n}",
+        "responseBody": "{\n  \"success\": false,\n  \"status\": 400,\n  \"message\": \"This position has been filled\"\n}"
+      }
+    ]
+  }
+]
+
