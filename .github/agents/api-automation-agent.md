@@ -10,43 +10,23 @@ You are responsible for automating API test cases end-to-end by following a stri
 
 Execute the following skills **in order**:
 
-### Step 1: Requirement Understanding
-- **Skill**: `requirement-understanding`
-- **Reference**: `.github/agents/skills/requirement-understanding/SKILL.md`
-- **Purpose**: Read and analyze the user story to understand all functional and non-functional requirements.
-- **Output**: A clear list of requirements, acceptance criteria, and API contracts identified from the user story.
-
-### Step 2: Test Case Generation
+### Step 1: Requirement Understanding + Test Case Generation
 - **Skill**: `testcase-generation`
-- **Reference**: `.github/agents/skills/testcase-generation/SKILL.md`
-- **Purpose**: Write API-driven technical test cases based on the understood requirements.
-- **Output**: A structured set of test cases covering positive, negative, and edge case scenarios.
+- **Reference**: `.github/skills/testcase-generation/SKILL.md`
+- **Purpose**: Read and analyse the user story (Phase 1), extract all acceptance criteria and API contracts, then generate the structured JSON test case file and auto-produce the Excel output (Phase 2).
+- **Output**: `src/main/resources/TestCases/data/<UserStoryName>.json` + `src/main/resources/TestCases/<UserStoryName>.xlsx`
 
-[//]: # (### Step 3: POJO Evaluation)
+### Step 2: Code Generation
+- **Skill**: `code-generation`
+- **Reference**: `.github/skills/code-generation/SKILL.md`
+- **Purpose**: Generate the actual automated test code using RestAssured + TestNG, based on the test cases produced in Step 1.
+- **Output**: Fully implemented test classes with all test methods under `src/test/java/com/hiring/tests/`.
 
-[//]: # (- **Skill**: `pojo-evaluation`)
-
-[//]: # (- **Reference**: `.github/agents/skills/pojo-evaluation/SKILL.md`)
-
-[//]: # (- **Purpose**: Evaluate and create/update POJO classes needed for request/response serialization.)
-
-[//]: # (- **Output**: POJO classes ready to be used in the automated test code.)
-
-[//]: # ()
-[//]: # (### Step 4: Code Generation)
-
-[//]: # (- **Skill**: `code-generation`)
-
-[//]: # (- **Reference**: `.github/agents/skills/code-generation/SKILL.md`)
-
-[//]: # (- **Purpose**: Generate the actual automated test code using RestAssured + TestNG.)
-
-[//]: # (- **Output**: Fully implemented test classes with all test methods.)
-
-[//]: # ()
-[//]: # (### Step 5: Test Execution)
-
-[//]: # (- **Skill**: `test-execution`)
+### Step 3: Report Generation
+- **Skill**: `report-generation`
+- **Reference**: `.github/skills/report-generation/SKILL.md`
+- **Purpose**: Integrate ExtentReports with the TestNG suite so every test run automatically produces a rich HTML report showing pass / fail / skip status, failure messages, and a summary dashboard.
+- **Output**: `reports/ExtentReport.html` generated after every `mvn test` or IDE TestNG run.
 
 [//]: # (- **Reference**: `.github/agents/skills/test-execution/SKILL.md`)
 
@@ -67,23 +47,35 @@ Execute the following skills **in order**:
 
 ## Rules
 
-1. **Sequential Execution**: Always follow the skill order (1 → 2 → 3 → 4 → 5 → 6). Never skip a step.
-2. **Gate Checks**: Do not proceed to the next skill if the current skill has failures or incomplete outputs.
-3. **Traceability**: Each test case must trace back to a requirement from Step 1.
-4. **Quality**: Generated code must follow the project's existing patterns (BaseTest, EndPoints, RestUtils, etc.).
+1. **Sequential Execution**: Always follow the skill order (1 → 2 → 3). Never skip a step.
+2. **Gate Checks**: Do not proceed to the next step if the current step has failures or incomplete outputs.
+3. **Traceability**: Each test case must trace back to an acceptance criteria extracted in Step 1 Phase 1.
+4. **Quality**: Generated code must follow the project's existing patterns (BaseTest, ActorHelper, RestUtils, URLGenerator, etc.).
 5. **No Manual Intervention**: The entire pipeline should run autonomously once triggered with a user story.
+6. **Reporting**: Every test run must produce `reports/ExtentReport.html` — the listener in `testng.xml` handles this automatically after Step 3 is applied.
+
+---
 
 ## Project Context
 
 - **Language**: Java 11
-- **Build Tool**: Maven
-- **Test Framework**: TestNG
-- **API Library**: RestAssured
-- **Package Structure**: `com.hiring.*` (base, tests, endpoints, pojo, utils)
-- **Config**: `src/test/resources/config/config.properties`
-- **Test Data**: `src/test/resources/testdata/`
+- **Build Tool**: Maven (`mvn test`)
+- **Test Framework**: TestNG 7.9.0 (`testng.xml`)
+- **API Library**: RestAssured 5.4.0
+- **Reporting**: ExtentReports 5.1.1 → `reports/ExtentReport.html`
+- **Package Structure**: `com.hiring.*` (tests, helpers, pojo, utils, commonMethods, generator)
+- **Config**: `src/main/resources/testdata/config.properties`
+- **Test Data**: `src/main/resources/testdata/`
+- **Test Cases**: `src/main/resources/TestCases/data/<UserStoryName>.json`
+
+---
 
 ## How to Trigger
 
-Provide a user story or requirement document, and this agent will execute all 6 skills sequentially to deliver fully automated, passing API tests with a Pull Request.
+Provide a user story or requirement document, and this agent will execute all 3 skills sequentially:
 
+```
+Step 1 → Extract ACs + generate JSON/Excel test cases
+Step 2 → Generate Java test class with TestNG + RestAssured
+Step 3 → Wire ExtentReports listener → reports/ExtentReport.html on every run
+```

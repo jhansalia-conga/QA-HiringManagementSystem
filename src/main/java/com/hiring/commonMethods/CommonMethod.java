@@ -2,6 +2,7 @@ package com.hiring.commonMethods;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Cell;
@@ -109,6 +110,7 @@ public class CommonMethod {
             Font headerFont = workbook.createFont();
             headerFont.setBold(true);
             headerStyle.setFont(headerFont);
+            applyThinBorder(headerStyle);
 
             Row headerRow = sheet.createRow(0);
             for (int i = 0; i < HEADERS.length; i++) {
@@ -123,6 +125,13 @@ public class CommonMethod {
         wrapStyle = workbook.createCellStyle();
         wrapStyle.setWrapText(true);
         wrapStyle.setVerticalAlignment(org.apache.poi.ss.usermodel.VerticalAlignment.TOP);
+        applyThinBorder(wrapStyle);
+
+        // Plain style (no wrap) for Sl No and TestCaseId
+        CellStyle plainStyle = workbook.createCellStyle();
+        plainStyle.setWrapText(false);
+        plainStyle.setVerticalAlignment(org.apache.poi.ss.usermodel.VerticalAlignment.TOP);
+        applyThinBorder(plainStyle);
 
         // --- Collect existing TestCaseIds to avoid duplicates ---
         Set<String> existingTestCaseIds = new HashSet<>();
@@ -154,14 +163,44 @@ public class CommonMethod {
 
                 if (s == 0) {
                     // First step row: fill in all metadata columns
-                    row.createCell(0).setCellValue(entry.slNo);
-                    row.createCell(1).setCellValue(entry.testCaseId);
-                    row.createCell(2).setCellValue(entry.testCaseName);
-                    row.createCell(3).setCellValue(entry.testCaseDescription);
+                    Cell slCell = row.createCell(0);
+                    slCell.setCellValue(entry.slNo);
+                    slCell.setCellStyle(plainStyle);
+
+                    Cell nameIdCell = row.createCell(1);
+                    nameIdCell.setCellValue(entry.testCaseId);
+                    nameIdCell.setCellStyle(plainStyle);
+
+                    Cell nameCell = row.createCell(2);
+                    nameCell.setCellValue(entry.testCaseName);
+                    nameCell.setCellStyle(wrapStyle);
+
+                    Cell descCell = row.createCell(3);
+                    descCell.setCellValue(entry.testCaseDescription);
+                    descCell.setCellStyle(wrapStyle);
+                } else {
+                    // Continuation rows: create empty cells with border so every cell has a border
+                    Cell emptySlCell = row.createCell(0);
+                    emptySlCell.setCellValue("");
+                    emptySlCell.setCellStyle(plainStyle);
+
+                    Cell emptyIdCell = row.createCell(1);
+                    emptyIdCell.setCellValue("");
+                    emptyIdCell.setCellStyle(plainStyle);
+
+                    Cell emptyNameCell = row.createCell(2);
+                    emptyNameCell.setCellValue("");
+                    emptyNameCell.setCellStyle(wrapStyle);
+
+                    Cell emptyDescCell = row.createCell(3);
+                    emptyDescCell.setCellValue("");
+                    emptyDescCell.setCellStyle(wrapStyle);
                 }
 
-                // TestSteps (col 4) — plain style
-                row.createCell(4).setCellValue(step.size() > 0 ? step.get(0) : "");
+                // TestSteps (col 4) — WRAP
+                Cell stepCell = row.createCell(4);
+                stepCell.setCellValue(step.size() > 0 ? step.get(0) : "");
+                stepCell.setCellStyle(wrapStyle);
 
                 // Request Body (col 5) — wrap-text so \n renders as real line breaks
                 Cell reqCell = row.createCell(5);
@@ -173,10 +212,13 @@ public class CommonMethod {
                 resCell.setCellValue(step.size() > 2 ? step.get(2) : "");
                 resCell.setCellStyle(wrapStyle);
 
-                // Set a reasonable row height for multi-line content (in points * 20)
+                // Set row height based on max line count across all wrapped columns
                 int lineCount = Math.max(
-                        countLines(step.size() > 1 ? step.get(1) : ""),
-                        countLines(step.size() > 2 ? step.get(2) : "")
+                        countLines(step.size() > 0 ? step.get(0) : ""),
+                        Math.max(
+                            countLines(step.size() > 1 ? step.get(1) : ""),
+                            countLines(step.size() > 2 ? step.get(2) : "")
+                        )
                 );
                 if (lineCount > 1) {
                     row.setHeight((short) Math.min(lineCount * 300, 8000));
@@ -186,12 +228,14 @@ public class CommonMethod {
             existingTestCaseIds.add(entry.testCaseId.trim());
         }
 
-        // Fix column widths: auto-size metadata cols; set explicit width for body cols
-        for (int i = 0; i <= 4; i++) {
-            sheet.autoSizeColumn(i);
-        }
-        sheet.setColumnWidth(5, 15000);  // Request Body ~120 chars wide
-        sheet.setColumnWidth(6, 20000);  // Response Body ~160 chars wide
+        // Set column widths (POI unit = 1/256th of a character width)
+        sheet.setColumnWidth(0, 5  * 256);   // Sl No           = 5 chars
+        sheet.setColumnWidth(1, 20 * 256);   // TestCaseId      = 20 chars
+        sheet.setColumnWidth(2, 30 * 256);   // TestCaseName    = 30 chars
+        sheet.setColumnWidth(3, 30 * 256);   // TestCaseDescription = 30 chars
+        sheet.setColumnWidth(4, 40 * 256);   // TestSteps       = 50 chars
+        sheet.setColumnWidth(5, 15000);      // Request Body
+        sheet.setColumnWidth(6, 18000);      // Response Body
 
         try (FileOutputStream fos = new FileOutputStream(file)) {
             workbook.write(fos);
@@ -322,6 +366,14 @@ public class CommonMethod {
     }
 
     // --------------- Helper ---------------
+
+    /** Applies a thin border on all 4 sides of a CellStyle */
+    private static void applyThinBorder(CellStyle style) {
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+    }
 
     private static String getCellValueAsString(Cell cell) {
         if (cell == null) return "";
